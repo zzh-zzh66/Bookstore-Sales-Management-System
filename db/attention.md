@@ -23,7 +23,7 @@ mysql -u root -p < lms_schema.sql
 
 # 或登录后执行
 USE `bookstore_lms`;
-SOURCE e:/LibraryManagementSystem/LMS/db/lms_schema.sql;
+SOURCE e:/Bookstore-Sales-Management-System/db/lms_schema.sql;
 
 - 密码提醒 ：初始用户的密码是 BCrypt 加密后的占位值：
 

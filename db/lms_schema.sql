@@ -142,10 +142,11 @@ CREATE TABLE `member` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='会员表';
 
 -- ============================================
--- 表结构: user (系统用户表)
+-- 表结构: system_user (系统用户表)
+-- 注意: 原user表因与MySQL保留字冲突，已重命名为system_user
 -- ============================================
-DROP TABLE IF EXISTS `user`;
-CREATE TABLE `user` (
+DROP TABLE IF EXISTS `system_user`;
+CREATE TABLE `system_user` (
     `user_id`       BIGINT          NOT NULL    AUTO_INCREMENT  COMMENT '用户ID',
     `username`      VARCHAR(50)     NOT NULL                    COMMENT '用户名（登录账号）',
     `password`      VARCHAR(255)    NOT NULL                    COMMENT '密码（BCrypt加密）',
@@ -180,6 +181,7 @@ CREATE TABLE `inventory` (
     `quantity`      INT             NOT NULL    DEFAULT 0       COMMENT '当前库存数量',
     `reserved_qty`  INT             NOT NULL    DEFAULT 0       COMMENT '预留数量（已下单未出库）',
     `sold_qty`      INT             NOT NULL    DEFAULT 0       COMMENT '累计已售数量',
+    `created_at`    DATETIME        NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `updated_at`    DATETIME        NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
 
     PRIMARY KEY (`inventory_id`),
@@ -225,7 +227,7 @@ CREATE TABLE `sale_order` (
     CONSTRAINT `fk_order_member` FOREIGN KEY (`member_id`)
         REFERENCES `member` (`member_id`) ON DELETE SET NULL,
     CONSTRAINT `fk_order_user` FOREIGN KEY (`user_id`)
-        REFERENCES `user` (`user_id`) ON DELETE RESTRICT
+        REFERENCES `system_user` (`user_id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='销售订单表';
 
 -- ============================================
@@ -304,7 +306,7 @@ CREATE TABLE `promotion_log` (
     CONSTRAINT `fk_promotion_book` FOREIGN KEY (`book_id`)
         REFERENCES `book` (`book_id`) ON DELETE CASCADE,
     CONSTRAINT `fk_promotion_user` FOREIGN KEY (`user_id`)
-        REFERENCES `user` (`user_id`) ON DELETE RESTRICT
+        REFERENCES `system_user` (`user_id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='促销价格变更日志表';
 
 -- ============================================
@@ -330,7 +332,7 @@ INSERT INTO `member_level` (`level_name`, `level_code`, `min_consumption`, `max_
 
 -- 插入系统用户（密码为 BCrypt 加密的 "admin123" 和 "seller123"）
 -- 实际部署时请修改为强密码
-INSERT INTO `user` (`username`, `password`, `real_name`, `role`, `status`) VALUES
+INSERT INTO `system_user` (`username`, `password`, `real_name`, `role`, `status`) VALUES
 ('admin', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVKIUi', '系统管理员', 'ADMIN', 1),
 ('seller01', '$2a$10$EqKcp1WFKVQIShe7FcbBDOBqVrKgAQB7uMu2o1aFGJPmJQFIEYGve', '张三', 'SALES', 1),
 ('seller02', '$2a$10$EqKcp1WFKVQIShe7FcbBDOBqVrKgAQB7uMu2o1aFGJPmJQFIEYGve', '李四', 'SALES', 1);
